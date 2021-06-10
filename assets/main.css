@@ -1,0 +1,32 @@
+img {
+    display: block;
+    margin: auto;
+    max-width: 100%;
+    background-color: #dddddd;
+}
+
+[title="trans"] {
+    background-color: transparent;
+}
+
+object {
+    display: block;
+    margin: auto;
+}
+
+embed {
+    display: block;
+    margin: auto
+}
+
+p {
+    text-indent: 2em;
+}
+
+.markdown-section table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin: 0 auto;
+    overflow: auto;
+    max-width: 80%
+}

@@ -1,0 +1,59 @@
+@startmindmap
+skinparam monochrome true
+skinparam Shadowing false
+skinparam DefaultTextAlignment center
+title: 各章节命令一览表
+
+* GitCourse
+	* Exp01
+		*_ <b>gh repo</b> [clone|create|fork|view]
+		*_ <b>gh issue</b> [list|view|status|create|close|reopen]
+		*_ <b>gh pr</b> [checks|list|view|create|close|reopen|diff|review|merge]
+		*_ <b>gh release</b> [view|list|create|delete|download|upload]
+		*_ <b>gh gist</b>
+	* Exp02
+		*_ <b>git config</b> [--global|system|local] <key> <value></b>
+		*_ <b>git init</b>
+		*_ <b>git add</b> [.|file|folder]</b>
+		*_ <b>git commit</b> [-m msg]</b>
+		*_ <b>git log</b>
+		*_ <b>git show</b>
+		*_ <b>git status</b>
+	* Exp03
+		*_ <b>git clone</b>
+		*_ <b>git fetch</b>
+		*_ <b>git push</b>
+		*_ <b>git remote</b>
+	* Exp04
+		*_ <b>git pull</b>
+		*_ <b>git branch</b>
+		*_ <b>git checkout</b>
+		*_ <b>git tag</b>
+		*_ <b>git diff/difftool</b>
+		*_ <b>git merge/mergetool</b>
+	* Exp05
+		*_ <b>git reset</b>
+		*_ <b>git revert</b>
+		*_ <b>git rebase</b> [-i]
+	* Exp06
+	* Exp07
+		*_ <b>git blame</b>
+	* Exp08
+		*_ <b>git stash</b>
+		*_ <b>git reflog</b>
+		*_ <b>git filter-branch</b>
+		*_ <b>git clean</b>
+	* Exp09
+		*_ <b>git cat-file</b>
+		*_ <b>git count-objects</b>
+		*_ <b>git gc</b>
+		*_ <b>git hash-object</b>
+		*_ <b>git symbolic-ref</b>
+	* Exp10
+		*_ <b>git archive</b>
+		*_ <b>git fsck</b>
+		*_ <b>git submodule</b>
+	* Exp11
+		*_ <b>git bisect</b>
+	* Exp12
+@endmindmap

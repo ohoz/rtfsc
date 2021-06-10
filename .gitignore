@@ -1,0 +1,4 @@
+_book/
+.vim.*
+MakeDate*
+.nvmrc

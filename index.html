@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="description" content="Description">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/lib/themes/vue.css">
+    <link rel="stylesheet" href="/assets/main.css">
+    <style type="text/css">
+        img {
+            display: block;
+            margin: auto;
+            max-width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app"></div>
+    <script>
+        window.$docsify = {
+            name: 'OHZ',
+            repo: 'https://gitee.com/ohz/doc',
+            loadSidebar: true,
+            loadNavbar: true,
+            relativePath: true,
+            auto2top: true,
+            autoHeader: false,
+            subMaxLevel: 3,
+            search: 'auto',
+            pagination: {
+                previousText: '上一篇',
+                nextText: '下一篇',
+                crossChapter: true,
+                crossChapterText: true,
+            },
+            copyCode: {
+                buttonText: 'Copy to clipboard',
+                errorText: 'Error',
+                successText: 'Copied'
+            },
+            footer: {
+                copy: '<span>©copyright; 2020</span>',
+                auth: '<b style="font-size: 12px">by OHZ</b>',
+                pre: '<hr/>',
+                style: 'text-align: right;',
+                class: 'className',
+            },
+        }
+    </script>
+    <script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/docsify-copy-code"></script>
+    <script src="//unpkg.com/docsify-footer-enh/dist/docsify-footer-enh.min.js"></script>
+</body>
+
+</html>
