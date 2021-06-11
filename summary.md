@@ -13,3 +13,12 @@
 2. 小鸿蒙嵌入式开发：使用 DevEco Device Tool 工具或直接 Docker 中编译，查看 [HarmonyOS Device](https://device.harmonyos.com/cn/home) 和 [HPM](https://hpm.harmonyos.com/#/cn/home) 两个网站，这部分开发模式与传统的嵌入式开发几乎没有区别：搭建环境、编译、烧录版本、JTAG 调试……
 
 本文档旨在拆解、分析小鸿蒙的源代码，为嵌入式开发提供学习资料和解决思路。
+
+本文档分析的代码拉取方式：
+
+```
+mkdir HarmonyOS
+cd HarmonyOS
+repo init -u https://gitee.com/openharmony/manifest.git  -b OpenHarmony_1.0.1_release --no-repo-verify
+repo sync -c
+```

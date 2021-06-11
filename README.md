@@ -1,6 +1,6 @@
 - [简介](summary.md)
-- [编译器及工具链子系统](prebuilts.md)
 - [组件化编译、构建和配置脚本](build.md)
+- [编译器及工具链子系统](prebuilts.md)
 - [驱动子系统](drivers.md)
 - [内核子系统](kernel.md)
 - [测试子系统](test.md)
