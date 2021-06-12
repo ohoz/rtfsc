@@ -10,7 +10,10 @@
 鸿蒙开发者相对应也被分为几类：
 
 1. 大鸿蒙 APP 开发：可平滑移植 AOSP 上 Android APP 开发，因为 HW 移植了 AOSP，接口保持了一致，这部分开发使用 DevEco Studio 工具，查看 [HarmonyOS Develope](https://developer.harmonyos.com/cn/home/) 网站文档。与安卓开发不同的是，这部分开发大量使用 js、ts，而不是 JAVA，更类似微信小程序的开发。
+   - HarmonyOS 应用开发官网：https://developer.harmonyos.com/cn
+   - 华为开发者联盟：[官网](https://developer.huawei.com/cn/)、[HarmonyOS](https://developer.huawei.com/consumer/cn/forum/block/harmonyos)、[weibo](https://m.weibo.cn/p/1005053211647923)
 2. 小鸿蒙嵌入式开发：使用 DevEco Device Tool 工具或直接 Docker 中编译，查看 [HarmonyOS Device](https://device.harmonyos.com/cn/home) 和 [HPM](https://hpm.harmonyos.com/#/cn/home) 两个网站，这部分开发模式与传统的嵌入式开发几乎没有区别：搭建环境、编译、烧录版本、JTAG 调试……
+   - HarmonyOS 设备开发官网：https://device.harmonyos.com/cn
 
 本文档旨在拆解、分析小鸿蒙的源代码，为嵌入式开发提供学习资料和解决思路。
 
