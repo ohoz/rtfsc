@@ -1,6 +1,10 @@
 # kernel_liteos_m 源码分析
 
-代码仓: https://gitee.com/openharmony/kernel_liteos_m
+**本章节解析的文件夹及对应源码路径如下：**
+
+| 文件夹          | gitee url                                     |
+| --------------- | --------------------------------------------- |
+| kernel/liteos_m | https://gitee.com/openharmony/kernel_liteos_m |
 
 ## 1.0 与 2.2 对比
 

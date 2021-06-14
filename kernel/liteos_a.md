@@ -1,6 +1,12 @@
 # kernel_liteos_a 源码分析
 
-代码仓: https://gitee.com/openharmony/kernel_liteos_a
+**本章节解析的文件夹及对应源码路径如下：**
+
+| 文件夹          | gitee url                                     |
+| --------------- | --------------------------------------------- |
+| kernel/liteos_a | https://gitee.com/openharmony/kernel_liteos_a |
+
+代码仓:
 
 ## 1.0 与 2.2 对比
 

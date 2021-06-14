@@ -1,5 +1,14 @@
 # Harmony 内核概览
 
+**本章节解析的文件夹及对应源码路径如下：**
+
+| 文件夹          | gitee url                                     |
+| --------------- | --------------------------------------------- |
+| kernel/liteos_a | https://gitee.com/openharmony/kernel_liteos_a |
+| kernel/liteos_m | https://gitee.com/openharmony/kernel_liteos_m |
+
+分支概览：
+
 | kernel   | git 分支                  | commit  | Files |  Lines | Blank | Comment |   Code | Size |
 | :------- | ------------------------- | ------- | ----: | -----: | ----: | ------: | -----: | ---: |
 | liteos_a | OpenHarmony_1.0.1_release | ebe33aa |   477 | 116055 | 15014 |   27090 |  73951 |  16M |
