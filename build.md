@@ -200,17 +200,32 @@ class Build():
 
     def ninja_build(self, cmd_args):
         ......
-
 ```
 
 实例化后调用 `build.build()`，它会依次调用 `check_in_device()`、`gn_build()` 和 `ninja_build()`。
 
 - `check_in_device()`：读取编译配置，根据产品选择的开发板，读取开发板 config.gni 文件内容，主要包括编译工具链、编译链接命令和选项等。
-- `gn_build()`：调用 gn gen 命令，读取产品配置生成产品解决方案 out 目录和 ninja 文件。
-- `ninja_build()`：调用 ninja -C out/board/product 启动编译。
+- `gn_build()`：调用 gn gen 命令，读取产品配置生成产品解决方案 out 目录和 ninja 文件。核心代码如下：
+  ```python
+          gn_cmd = [gn_path,
+                  '--root={}'.format(self.config.root_path),
+                  '--dotfile={}/.gn'.format(self.config.build_path),
+                  'clean',
+                  self.config.out_path]
+          exec_command(gn_cmd, log_path=self.config.log_path)
+  ```
+- `ninja_build()`：调用 ninja -C out/board/product 启动编译。核心代码如下：
+  ```python
+          ninja_cmd = [ninja_path,
+                      '-w',
+                      'dupbuild=warn',
+                      '-C',
+                      self.config.out_path] + ninja_args
+          exec_command(ninja_cmd, log_path=self.config.log_path, log_filter=True)
+  ```
 - 系统镜像打包：将组件编译产物打包，设置文件属性和权限，制作文件系统镜像。
 
-## python build.py
+### python build.py
 
 根目录下的 build.py 通常是 build/lite/build.py 的软连接，执行 `python build.py` 时会运行到 build.py 的 `build()` 函数：
 
@@ -227,60 +242,9 @@ python build.py ipcamera_hi3518ev300 -b debug # 全量编译为 debug 版本
 python build.py ipcamera_hi3518ev300 -T applications/sample/camera/app:camera_app # 单模块编译
 ```
 
-所以，build.py 实现了不安装 hb 也能编译的目的。
+可以说，build.py 实现了“不安装 hb 也能编译”的目的，其他好像没做什么。
 
-## hpm
-
-hpm 也是 HW 开发的 build 工具，js 语言，npm 安装：
-
-```bash
-$ npm install -g @ohos/hpm-cli
-```
-
-在安装路径中可看到其源码：
-
-```bash
-root@90065f887932:/home/openharmony# hpm -V
-1.2.1
-root@90065f887932:/home/openharmony# which hpm
-/home/tools/node-v12.20.0-linux-x64/bin/hpm
-root@90065f887932:/home/openharmony# ls /home/tools/node-v12.20.0-linux-x64/lib/node_modules/@ohos/hpm-cli
-bin                 lib      node_modules  README.md
-hpm-debug-build.js  LICENSE  package.json  README_ZH.md
-```
-
-## DevEco Device Tool
-
-/home/kevin/.deveco-device-tool/core/deveco-venv/bin/hos run --project-dir /home/kevin/workspace/harmony/src/bearpi --environment bearpi_hm_nano
-
-## 编译流程总结
-
-有多种获取和编译 harmony 源码的方式
-
-| NO. | 编译方式\源码获取方式 | `repo ...` | `hpm i @xxx/xxx` | DevEco New Project | 备注 |
-| --- | --------------------- | :--------: | :--------------: | :----------------: | ---- |
-| 1.  | `python build.py`     |     Y      |                  |                    |      |
-| 2.  | `hb set`, `hb build`  |     Y      |                  |                    |      |
-| 3.  | `hpm build/dist`      |            |        Y         |         Y          |      |
-| 4.  | DevEco build          |            |                  |         Y          |      |
-
-> 1、2、3 都可以在 harmony 的 docker 中执行
-
-```plantuml
-@startmindmap
-* python build.py [build]
- * hb set
-  * set_root_path()
-   * 提示用户选择源码根目录
-  * set_product()
-   * 搜索 vender/.../config.json，提示用户选择编译目标
-   * 根据用户选择的 config.json，读取其中的 device info（device、board、kernel、features、components）
-   * 生成 ohos_config.json
- * hb build
-@endmindmap
-```
-
-## History
+### History
 
 - 2020.12.05: 内核从 liteos_riscv 更名为 liteos_m，build 做适配。
 
@@ -332,3 +296,241 @@ Date:   Sat Apr 3 08:55:13 2021 +0800
     Feature or Bugfix: Feature
     Binary Source: No
 ```
+
+## hpm
+
+hpm 是 2020 下半年开始，HW 开发的包管理平台，js 语言，npm 安装和更新：
+
+```bash
+$ npm install -g @ohos/hpm-cli # 安装
+$ npm update  -g @ohos/hpm-cli # 更新
+$ npm rm      -g @ohos/hpm-cli # 卸载
+```
+
+### 基本命令
+
+- `hpm init [-t template]` 在一个文件夹中初始化一个 hpm 包，主要是创建 bundle.json 文件
+
+```bash
+$ hpm init -t dist
+Initialization finished.
+$ cat bundle.json
+{
+  "name": "dist",
+  "version": "1.0.0",
+  "publishAs": "distribution",
+  "description": "this is a distribution created by template",
+}
+```
+
+- `hpm i|install [name]` 下载依赖并安装，必须在已经 `hpm init` 的目录下执行
+
+```bash
+$ hpm i @ohos/hispark_pegasus
+```
+
+- `hpm d|download [name]` 仅下载指定包(tgz 文件），不下载依赖，可以在任何目录中执行
+
+```bash
+$ hpm d @ohos/hispark_pegasus
+$ ls @ohos-hispark_pegasus-1.0.3.tgz
+@ohos-hispark_pegasus-1.0.3.tgz
+```
+
+- `hpm list` 打印依赖关系图
+
+```bash
+$ hpm list
++--dist@1.0.0
+│ +--@ohos/hispark_pegasus@1.0.3
+│ │ +--@ohos/bootstrap@1.1.1
+│ │ +--@ohos/bounds_checking_function@1.1.1
+```
+
+- `hpm pack` 打包组件（bundle），生成 tgz 文件。
+
+```bash
+$ hpm pack
+> Packing dist-1.0.0.tgz /home/kevin/workspace/harmony/src/hpm.i/@hihope-neptune_iot
+>   directory .
+>     . . bundle.json
+>     . . README.md
+>     . . LICENSE
+> Packing dist-1.0.0.tgz finished.
+```
+
+harmony 的组件（bundle）和发行版（distribution）之间是包含关系，组件由`代码 + bundle.json + README + LICENSE` 组成，发行版由 `多个组件 + scripts` 组成，官方给出的关系图：
+
+![](images/bundle.and.distribution.png)
+
+- `hpm ui` 创建 http 访问的前端，在浏览器上可查看多种信息，执行多种命令，也可以在 docker 中执行，在 host 中浏览器访问。
+
+![](images/hpm-cli-ui.png)
+
+hpm 迭代很快，尤其是 2021.6.2 发布 Harmony2.0 以后，几天一更新，所以，即使使用 docker 容器，也建议先升级一下 hpm，以获取最新版本的特性。
+
+### 源码解析
+
+hpm 相比 hb，增加了包管理的概念，不再是纯的编译框架，hb 无法管理包之间的依赖关系，以及同一个包的多版本控制，hpm 类似 pip、npm 解决这些问题。
+
+从 [hpm-cli 在 npm 官网](https://www.npmjs.com/package/@ohos/hpm-cli) 上看，2020.8 提交 0.0.1 版本，但一直都没什么下载量，直到 2021.5 才开始有下载。源码暂时没找到，只能从其安装路径中看到一些：
+
+```bash
+$ hpm -V
+1.2.6
+$ which hpm
+/home/kevin/.nvm/versions/node/v14.15.0/bin/hpm
+$ ls ~/.nvm/versions/node/v14.15.0/lib/node_modules/@ohos/hpm-cli
+bin  hpm-debug-build.js  lib  LICENSE  node_modules  package.json  README.md  README_ZH.md
+```
+
+hpm 为每个子命令定义了一个 js 文件
+
+```bash
+$ ls ~/.nvm/versions/node/v14.15.0/lib/node_modules/@ohos/hpm-cli/lib/commands
+build.js        download.js      init.js     publish.js  uninstall.js
+checkUpdate.js  extract.js       install.js  run.js      update.js
+code.js         fetch.js         lang.js     script.js
+config.js       generateKeys.js  list.js     search.js
+distribute.js   index.js         pack.js     ui.js
+```
+
+每次执行 `hpm xxx` 命令，main.js 解析入参并转给相应的 command(lib/commands/xxx.js)，每个命令的执行逻辑可参考代码，比如 dist 会检查 build 框架，然后交权给 build 命令，build 会先检查依赖，然后进行单线程 or 多线程编译，这里的编译依然会使用 gn 和 ninja，编译完毕后 dist 会进行打包。
+
+```plantuml
+@startuml
+:hpm xxx;
+partition lib/main.js {
+    :解析入参;
+    :调用对应命令;
+}
+fork
+:xxx = dist;
+partition lib/commands/distribute.js {
+    :调用 distribute() 函数;
+    :调用 bundleDist();
+    :_build.bundleBuild() 转入 build;
+    :runDistCmd() 打包;
+}
+fork again
+:xxx = build;
+partition lib/commands/build.js {
+    :调用 build() 函数;
+    :startBuild();
+    if (多线程) then
+    :startBuildThread();
+    else
+    :bundleBuild();
+    endif
+}
+fork again
+:xxx = init;
+partition lib/commands/init.js {
+    :......;
+}
+fork again
+:xxx = pack;
+partition lib/commands/pack.js {
+    :......;
+}
+end fork
+
+end
+@enduml
+```
+
+### History
+
+- 1.1.0（202104）：新增 GUI，`hpm ui` 启动
+- 1.2.3（202106）：新增 `fetch`、`download`、`code` 子命令
+
+## DevEco Device Tool
+
+HUAWEI DevEco Device Tool（下文简称 DDT）是 HarmonyOS 面向智能设备开发者提供的一站式集成开发环境，它比 hpm 提供了更多的功能：组件按需定制，支持代码编辑、烧录和调试等。
+
+所以 DDT 已经不再局限与本文所讨论的**编译**，但 DDT 的编译过程又比较特殊，它更加灵活的使用 hb、hpm 等工具，并又开发了一个 hos。当你使用 DDT build 的时候，执行了这个命令：
+
+```bash
+/home/kevin/.deveco-device-tool/core/deveco-venv/bin/hos run --project-dir /home/kevin/workspace/harmony/src/bearpi --environment bearpi_hm_nano
+```
+
+DDT 安装在 `~/.deveco-device-tool`，主要含 3 个文件夹：core、platforms、plugins
+
+core 包含了编译、调试、烧录工具，和 python 的虚拟环境：
+
+```bash
+$ ls .deveco-device-tool/core
+arm_noneeabi_gcc  deveco-venv                     tool_hiburn                 tool_openocd
+contrib_pysite    feature-toggling-manifest.json  tool_lldb                   tool_scons
+deveco-home       tool_burn                       tool_openlogic_openjdk_jre  tool_trace
+```
+
+platforms 包含针对不同 SoC 厂家的编译工具，海思、联盛德、NXP……每家一个文件夹，大多是 python 实现，其中有些含 hb.py，有些没有 hb，看来定制化已经让编译工具五花八门，HW 也不管了，自家分开玩儿吧。
+
+```bash
+$ ls .deveco-device-tool/platforms
+asrmicro  bestechnic  blank  bouffalo  hisilicon  nxp  realtek  winnermicro  xradio
+```
+
+其中的 asrmicro（翱捷科技）、bestechnic（恒玄科技）、bouffalo（博流科技）、xradio（芯之联）都还没见到其开发板，应该在开发中或已经 alpha 状态了。
+
+plugins 中包含 VSCode 的扩展文件
+
+```bash
+$ ls .deveco-device-tool/plugins
+deveco-device-tool-2.2.0+285431.76f4090e.vsix
+```
+
+由于 DDT 既不开源，也缺乏文档，所以暂时很难解读，以后再说。
+
+官方资源：
+
+- [DDT 下载](https://device.harmonyos.com/cn/ide#download_release)
+- [DDT 版本说明](https://device.harmonyos.com/cn/docs/ide/releases/release_notes-0000001057397722)
+- [HUAWEI DevEco Device Tool 常见问题](https://developer.huawei.com/consumer/cn/forum/topic/0203380024404140371?fid=26)
+
+## 总结
+
+### 兼容关系图
+
+```plantuml
+@startmindmap
+* python build.py [build]
+ * hb set
+  * set_root_path()
+   * 提示用户选择源码根目录
+  * set_product()
+   * 搜索 vender/.../config.json，提示用户选择编译目标
+   * 根据用户选择的 config.json，读取其中的 device info（device、board、kernel、features、components）
+   * 生成 ohos_config.json
+ * hb build
+@endmindmap
+```
+
+### 下载-编译对比表
+
+| 对比项            | HarmonyOS (repo) |  neptune (hpm)   | pegasus (hpm) | 3861 (DE) | bearpi (DE) | 3516/8 (DE) |
+| ----------------- | :--------------: | :--------------: | :-----------: | :-------: | :---------: | :---------: |
+| 别称              |        \*        |   HH-SLNPT10x    |  Hi3861V100   |           |             |             |
+| SoC               |        \*        | WinnerMicro W800 |    Hi3861     |  Hi3861   |   Hi3861    |  Hi3516/18  |
+| SoC Kernel        |        \*        | 玄铁 804(RISC-V) |    RISC-V     |   同左    |    同左     |  Cortex-A7  |
+| 外设              |        \*        | 2MB(F)+288KB(R)  |               |           |             |             |
+| 特色              |        \*        |     WiFi、BT     |  2.4GHz WiFi  |   同左    |             |             |
+| Vendor            |        \*        |   润和(hihope)   | 海思(HiSili)  |   同左    |   小熊派    |             |
+| `/build.py`       |        Y         |        -         |               |     -     |             |             |
+| `/.deveco`        |        -         |        -         |       -       |     Y     |      Y      |             |
+| `/.vscode`        |        -         |        -         |       -       |     Y     |      Y      |             |
+| `/device`         |        Y         |       [Y]        |               |     -     |             |             |
+| `/vendor`         |        Y         |        -         |               |     Y     |             |             |
+| `/build/`         |        Y         |        Y         |       Y       |     Y     |      -      |      -      |
+| `/build/lite/hb`  |        Y         |        -         |       Y       |     -     |      -      |      -      |
+| `hb build`        |                  |                  |               |           |             |             |
+| `python build.py` |                  |                  |               |           |             |             |
+| `hpm dist`        |                  |                  |               |           |             |             |
+| `DE build`        |                  |                  |               |           |             |             |
+
+- pegasus: 飞马、天马
+- neptune：海王星
+- taurus：金牛座
+- aries：白羊座
+- WinnerMicro：北京联盛德微电子
