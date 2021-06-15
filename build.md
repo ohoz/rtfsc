@@ -2,9 +2,15 @@
 
 **本章节解析的文件夹及对应源码路径如下：**
 
-| hpm 组件名       | 源码目录   | gitee url                                            |
-| ---------------- | ---------- | ---------------------------------------------------- |
-| @ohos/build_lite | build/lite | https://openharmony.gitee.com/openharmony/build_lite |
+| hpm 组件名           | 源码目录   | gitee url                                            |
+| -------------------- | ---------- | ---------------------------------------------------- |
+| [@ohos/build][]      | build      | https://openharmony.gitee.com/openharmony/build      |
+| [@ohos/build_lite][] | build/lite | https://openharmony.gitee.com/openharmony/build_lite |
+
+[@ohos/build]: https://hpm.harmonyos.com/#/cn/bundles/@ohos%2Fbuild/v/2.0.0
+[@ohos/build_lite]: https://hpm.harmonyos.com/#/cn/bundles/@ohos%2Fbuild_lite/v/2.0.0
+
+build 和 build_lite 是 harmony 官方出品的 2 个组件，第 3 方做的 build 方面的组件也非常多，本文不一一解析。
 
 获取源码（本文以 `hpm i @ohos/hispark_pegasus` 为例）后，如果想编译通过，需要走这样几步：
 
