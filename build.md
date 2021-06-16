@@ -515,25 +515,30 @@ deveco-device-tool-2.2.0+285431.76f4090e.vsix
 
 ### 下载-编译对比表
 
-| 对比项            | HarmonyOS (repo) |  neptune (hpm)   | pegasus (hpm) | 3861 (DE) | bearpi (DE) | 3516/8 (DE) |
-| ----------------- | :--------------: | :--------------: | :-----------: | :-------: | :---------: | :---------: |
-| 别称              |        \*        |   HH-SLNPT10x    |  Hi3861V100   |           |             |             |
-| SoC               |        \*        | WinnerMicro W800 |    Hi3861     |  Hi3861   |   Hi3861    |  Hi3516/18  |
-| SoC Kernel        |        \*        | 玄铁 804(RISC-V) |    RISC-V     |   同左    |    同左     |  Cortex-A7  |
-| 外设              |        \*        | 2MB(F)+288KB(R)  |               |           |             |             |
-| 特色              |        \*        |     WiFi、BT     |  2.4GHz WiFi  |   同左    |             |             |
-| Vendor            |        \*        |   润和(hihope)   | 海思(HiSili)  |   同左    |   小熊派    |             |
-| `/build.py`       |        Y         |        -         |               |     -     |             |             |
-| `/.deveco`        |        -         |        -         |       -       |     Y     |      Y      |             |
-| `/.vscode`        |        -         |        -         |       -       |     Y     |      Y      |             |
-| `/device`         |        Y         |       [Y]        |               |     -     |             |             |
-| `/vendor`         |        Y         |        -         |               |     Y     |             |             |
-| `/build/`         |        Y         |        Y         |       Y       |     Y     |      -      |      -      |
-| `/build/lite/hb`  |        Y         |        -         |       Y       |     -     |      -      |      -      |
-| `hb build`        |                  |                  |               |           |             |             |
-| `python build.py` |                  |                  |               |           |             |             |
-| `hpm dist`        |                  |                  |               |           |             |             |
-| `DE build`        |                  |                  |               |           |             |             |
+| 对比项            | HarmonyOS (repo) |  neptune (hpm)   | pegasus (hpm) | 3861 (DDT) | bearpi (DDT) | 3516/8 (DDT) |
+| ----------------- | :--------------: | :--------------: | :-----------: | :--------: | :----------: | :----------: |
+| 别称              |        \*        |   HH-SLNPT10x    |  Hi3861V100   |            |              |              |
+| SoC               |        \*        | WinnerMicro W800 |    Hi3861     |   Hi3861   |    Hi3861    |  Hi3516/18   |
+| SoC Kernel        |        \*        | 玄铁 804(RISC-V) |    RISC-V     |    同左    |     同左     |  Cortex-A7   |
+| 外设              |        \*        | 2MB(F)+288KB(R)  |               |            |              |              |
+| 特色              |        \*        |     WiFi、BT     |  2.4GHz WiFi  |    同左    |              |              |
+| Vendor            |        \*        |   润和(hihope)   | 海思(HiSili)  |    同左    |    小熊派    |              |
+| `/build.py`       |        Y         |        -         |               |     -      |              |              |
+| `/.deveco`        |        -         |        -         |       -       |     Y      |      Y       |              |
+| `/.vscode`        |        -         |        -         |       -       |     Y      |      Y       |              |
+| `/device`         |        Y         |       [Y]        |               |     -      |              |              |
+| `/vendor`         |        Y         |        -         |               |     Y      |              |              |
+| `/build/`         |        Y         |        Y         |       Y       |     Y      |      -       |      -       |
+| `/build/lite/hb`  |        Y         |        -         |       Y       |     -      |      -       |      -       |
+| `hb build`        |        Y         |                  |               |            |              |              |
+| `python build.py` |        Y         |                  |               |            |              |              |
+| `hpm dist`        |                  |        Y         |       Y       |            |              |              |
+| `DDT build`       |                  |                  |               |     Y      |      Y       |      Y       |
+
+- DDT 方式下载的有 `.deveco` 和 `.vscode` 文件夹，编译也需要 `.deveco`。
+- DDT 可以使用已经安装的 platforms 中的 build 工具，所以 `build/lite` 都不需要了，`hb build` 和 `python build.py` 也不可用了。
+
+## 参考
 
 - pegasus: 飞马、天马
 - neptune：海王星
