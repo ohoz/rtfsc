@@ -1,4 +1,4 @@
-# Harmony 驱动子系统
+# OpenHarmony 驱动子系统
 
 HDF（HarmonyOS Driver Foundation）驱动框架：
 

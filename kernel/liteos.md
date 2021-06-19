@@ -1,4 +1,4 @@
-# Harmony 内核概览
+# OpenHarmony 内核概览
 
 **本章节解析的文件夹及对应源码路径如下：**
 
@@ -21,11 +21,9 @@
 | liteos_m | OpenHarmony_1.0.1_release | 0d403fc |   720 | 237977 | 33562 |   81376 | 123039 |  15M |
 | liteos_m | OpenHarmony-v2.2-Beta     | bd30759 |  1359 | 210535 | 27815 |   74071 | 108649 |  46M |
 
-> git 分支 + commit 可以准确定位到具体的位置
-
-- v2.2 的 liteos_a 代码行是 liteos_m 的 **2.4 倍**
-- liteos_a 的 1.0 到 2.2 有大量的代码新增(331%)，体积翻倍。
-- liteos_m 的 1.0 到 2.2 代码有减少(12%)，文件翻倍了，但代码量减少了，架构有大幅的精简。
+- liteos_a 代码行相比 liteos_m：v1.0 还是其 **60%**，v2.2 已经是其 **240%**。
+- liteos_a 的 1.0 到 2.2 有大量的代码新增(331%)，体积翻倍，主要多写了 17 万行的测试用例(testsuites)。
+- liteos_m 的 1.0 到 2.2 代码有减少(12%)，架构有大幅的精简（去掉了意法半导体的 cortex-m 支持）。但文件体积翻倍了，主要是新增了芯来（nuclei）的芯片（`kernel/arch/risc-v`）和开发板（`targets/riscv_nuclei...`）代码。
 
 ---
 
@@ -55,5 +53,5 @@
 
 - liteos_a 是一个完整的 OS，liteos_m 只相当于一个 kernel
 - 缺少文件系统的支持，让 liteos_m 只能工作在 flash 裸区
-- liteos_m 包含了 arch 代码，去除这部分代码，仅计算传统意义的 kernel（任务、进程、调度、通信……）仅 6k 行，而 liteos_a 的 kernel 全部都是这些代码，越 28k 行，是 liteos_m 的 4.5 倍。
+- `liteos_m/kernel` 包含了 arch 代码，去除这部分代码，仅计算传统意义的 kernel（任务、进程、调度、通信……）仅 6k 行，而 `liteos_a/kernel` 全部都是纯 kernel 代码，超 28k 行，是 liteos_m 的 4.5 倍。
 - liteos_a 中的虚拟内存管理、ipc、内存映射、misc ……都是 liteos_m 没有的。

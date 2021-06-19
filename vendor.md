@@ -1,1 +1,1 @@
-# Harmony 厂商提供软件
+# OpenHarmony 厂商提供软件

@@ -1,23 +1,32 @@
 # OpenHarmony 简介
 
-## 大小鸿蒙
+## 鸿蒙的蓝海与红海
 
 本文档将 Harmony（鸿蒙）分为 2 个概念：
 
-1. 大鸿蒙：下图中红色 + 蓝色部分，HW 于 2021.06.02 发布的 HarmonyOS2.0 即是此概念
-2. 小鸿蒙：下图中红色部分，HW 贡献给 [OpenHarmony（原子社区）](https://gitee.com/openharmony)的代码
+1. 蓝鸿蒙：下图中蓝色部分，主要用于智能终端，HW 没开源，仅与商业合作伙伴合作，基于 Android 的 AOSP（目前是 Android 11）。
+2. 红鸿蒙：下图中红色部分，主要用于 IoT，HW 贡献给 [OpenHarmony（原子社区）](https://gitee.com/openharmony)的代码，于 2021.06.02 发布的 HarmonyOS2.0 即是此概念。
 
 ![](images/position.svg)
 
-鸿蒙开发者相对应也被分为几类：
+HW 有意混淆两个鸿蒙的概念，对公众不解释物联网、智能终端之间鸿蒙的差异，应该是有些特殊的因素，但这也为鸿蒙品牌带来了风险：HW 高管有些说鸿蒙没有拷贝 Android 一行代码，但未指明是红鸿蒙；又有些高管说鸿蒙基于 AOSP，平滑移植 Android APP，但未指明是蓝鸿蒙 —— 这些宣传会给大众造成一定的困扰。
 
-1. 大鸿蒙 APP 开发：可平滑移植 AOSP 上 Android APP 开发，因为 HW 移植了 AOSP，接口保持了一致，这部分开发使用 DevEco Studio 工具，查看 [HarmonyOS Develope](https://developer.harmonyos.com/cn/home/) 网站文档。与安卓开发不同的是，这部分开发大量使用 js、ts，而不是 JAVA，更类似微信小程序的开发。
-   - HarmonyOS 应用开发官网：https://developer.harmonyos.com/cn
-   - 华为开发者联盟：[官网](https://developer.huawei.com/cn/)、[HarmonyOS](https://developer.huawei.com/consumer/cn/forum/block/harmonyos)、[weibo](https://m.weibo.cn/p/1005053211647923)
-2. 小鸿蒙嵌入式开发：使用 DevEco Device Tool 工具或直接 Docker 中编译，查看 [HarmonyOS Device](https://device.harmonyos.com/cn/home) 和 [HPM](https://hpm.harmonyos.com/#/cn/home) 两个网站，这部分开发模式与传统的嵌入式开发几乎没有区别：搭建环境、编译、烧录版本、JTAG 调试……
-   - HarmonyOS 设备开发官网：https://device.harmonyos.com/cn
+鸿蒙开发者相对应也被分为 2 类：
 
-本文档旨在拆解、分析小鸿蒙的源代码，为嵌入式开发提供学习资料和解决思路。
+1. 蓝鸿蒙 APP 开发（北向开发）：可平滑移植 AOSP 上 Android APP 开发，与 AOSP 接口保持了一致，这部分开发使用 DevEco Studio 工具，查看 [HarmonyOS Develope](https://developer.harmonyos.com/cn/home/) 和 华为开发者联盟（ [官网](https://developer.huawei.com/cn/)、[HarmonyOS](https://developer.huawei.com/consumer/cn/forum/block/harmonyos)、[weibo](https://m.weibo.cn/p/1005053211647923)）网站文档。与安卓开发不同的是，这部分开发除了使用 JAVA 外，还大量使用 js、ts，有点类似微信小程序的开发。
+2. 红鸿蒙嵌入式开发（南向开发）：使用 DevEco Device Tool 工具或直接 Docker 中编译，查看 [HarmonyOS Device](https://device.harmonyos.com/cn/home) 和 [HPM](https://hpm.harmonyos.com/#/cn/home) 两个网站，这部分开发模式与传统的嵌入式开发几乎没有区别：搭建环境、编译、烧录版本、JTAG 调试……
+
+**本文档仅拆解、分析开源的红鸿蒙的源码，不涉及蓝鸿蒙部分，拿不到源码，拿到想分析也有心无力，所以北向（APP）开发以后再说。**
+
+## SoC 兼容
+
+| Soc/IP                | Cortex-A       | Cotrex-M          | RISC-V    | 备注              |
+| --------------------- | -------------- | ----------------- | --------- | ----------------- |
+| 海思                  | Hi3516、Hi3518 |                   | Hi3861    |                   |
+| 联盛德(WinnerMicro)   |                |                   | W800      |                   |
+| 兆易(GD)/芯来(Nuclei) |                |                   | gd32vf103 | Harmony2.0 新增   |
+| Sifive                |                |                   | fe310     |                   |
+| 意法                  |                | ~~STM32f103/429~~ |           | Harmony2.0 已去除 |
 
 ## 环境、源码、编译
 
@@ -72,14 +81,14 @@ hpm -V
 
 - 找到开发版：在 [HPM 官网](https://hpm.harmonyos.com/#/cn) 上找，或者使用 `hpm search -t distribution` 命令搜索可用的发行版
 
-> 发行版，不是开发板！HPM 发行版对标的是 Linux 发行版概念，指一套软件的集合，但一般与一个开发板对应。
+> 发行版，不是发行板！HPM 发行版对标的是 Linux 发行版概念，指一套软件的集合，但一般与一个开发板对应。  
 > 以前做嵌入式开发，通常为一个开发板做一套 BSP（板级支持包），但 APP 团队（或部门）拿到 BSP 后做 APP 开发仍会有相当的困难，现在鸿蒙封装出发行版的概念，将 BSP 和 APP 及其 Examples 都打包，极大的降低了二次开发者的门槛。
 
 ```bash
 $ hpm search -t distribution
-┌─────────┬─────────────────────────────────────┬─────────┬─────────────────────────────────────────────────────────────────────┐
+┌---------┬-------------------------------------┬---------┬---------------------------------------------------------------------┐
 │ (index) │                name                 │ version │                             description                             │
-├─────────┼─────────────────────────────────────┼─────────┼─────────────────────────────────────────────────────────────────────┤
+├---------┼-------------------------------------┼---------┼---------------------------------------------------------------------┤
 │    0    │        '@hihope/neptune_iot'        │ '1.0.1' │             '适用于HiHope Neptune WiFi/BT IOT 模组开发'             │
 │    1    │   '@bearpi/bearpi_hm_nano_flower'   │ '1.1.0' │            '基于BearPi-HM_Nano开发板实现的护花使者案例'             │
 │    2    │ '@bearpi/bearpi_hm_nano_agricul...' │ '1.1.0' │            '基于BearPi-HM_Nano开发板实现的智慧农业案例'             │
@@ -99,10 +108,29 @@ hpm i @ohos/hispark_aries
 hpm dist # 或 hpm build
 ```
 
-### 3. DevEco Device Tool 完成一切
+### 3. DevEco Device Tool 一站式服务
 
 - 安装 VSCode、Nodejs、Python
 - [安装 DevEco Device Tool](https://device.harmonyos.com/cn/docs/ide/user-guides/install_ubuntu-0000001072959308)
 - 在 VSCode 中打开 DevEco 扩展
   - New Project：选择开发版
   - Build：使用的 hos 命令
+
+## 源码目录
+
+本站即基于此目录展开。
+
+| 目录名       | 描述                                  |
+| ------------ | ------------------------------------- |
+| build        | 组件化编译、构建和配置脚本            |
+| prebuilts    | 编译器及工具链子系统                  |
+| kernel       | 内核子系统                            |
+| drivers      | 驱动子系统                            |
+| test         | 测试子系统                            |
+| domains      | 增强软件服务子系统集                  |
+| foundation   | 系统基础能力子系统集                  |
+| base         | 基础软件服务子系统集&硬件服务子系统集 |
+| third_party  | 开源第三方组件                        |
+| utils        | 常用的工具集                          |
+| vendor       | 厂商提供的软件                        |
+| applications | 应用程序样例，包括 camera 等          |

@@ -1,4 +1,4 @@
-# HarmonyOS 拾遗
+# OpenHarmonyOS 拾遗
 
 ## 产品兼容性规范
 
