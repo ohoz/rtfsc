@@ -1,1 +1,1 @@
-# Harmony 第三方组件
+# OpenHarmony 第三方组件
