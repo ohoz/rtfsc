@@ -18,15 +18,43 @@ HW 有意混淆两个鸿蒙的概念，对公众不解释物联网、智能终�
 
 **本文档仅拆解、分析开源的红鸿蒙的源码，不涉及蓝鸿蒙部分，拿不到源码，拿到想分析也有心无力，所以北向（APP）开发以后再说。**
 
-## SoC 兼容
+## Arch、SoC、target
 
-| Soc/IP                | Cortex-A       | Cotrex-M          | RISC-V    | 备注              |
-| --------------------- | -------------- | ----------------- | --------- | ----------------- |
-| 海思                  | Hi3516、Hi3518 |                   | Hi3861    |                   |
-| 联盛德(WinnerMicro)   |                |                   | W800      |                   |
-| 兆易(GD)/芯来(Nuclei) |                |                   | gd32vf103 | Harmony2.0 新增   |
-| Sifive                |                |                   | fe310     |                   |
-| 意法                  |                | ~~STM32f103/429~~ |           | Harmony2.0 已去除 |
+鸿蒙目前支持的 Arch（架构）仅有：ARM 的 Cortex-A 中的 A9、Cotrex-M（已逐步放弃）；RISC-V 由于是开源架构，所以 IP 公司很多，比如芯来科技，国内的兆易基于芯来的 IP 开发的 SoC GD32 系列很有一飞冲天的气势。
+
+**Arch 与 SoC：**
+
+| Soc/IP \ Arch         | Cortex-A       | Cotrex-M      | RISC-V    | 备注              |
+| --------------------- | -------------- | ------------- | --------- | ----------------- |
+| 海思                  | Hi3516、Hi3518 |               | Hi3861    |                   |
+| 联盛德(WinnerMicro)   |                |               | W800      |                   |
+| 兆易(GD)/芯来(Nuclei) |                |               | GD32vf103 | Harmony2.0 新增   |
+| Sifive                |                |               | fe310     |                   |
+| 意法                  |                | STM32f103/429 |           | Harmony2.0 已去除 |
+| NXP                   | i.MX6          |               |           |                   |
+
+> Hi3516 Core 是 Cortex-A7@800MHz + A17@1.25GHz；
+> Hi3518 Core 是 Cortex-A926@440MHz
+
+**SoC 与 开发板(target)：**
+
+| Vendor \ Soc    | Hi3516/18             | i.MX6   | Hi3861               | SMT32      | GD32x           | W800        |
+| --------------- | --------------------- | ------- | -------------------- | ---------- | --------------- | ----------- |
+| 海思            |                       |         |                      |            |                 |             |
+| [芯来][]        |                       |         |                      |            | [Nuclei Demo][] |             |
+| [润和 Hihope][] | [HiSpark AI/Camera][] |         | [HiSpark WiFi IoT][] |            |                 | [Neptune][] |
+| 小熊派          |                       |         | [BearPi-HM_Nano][]   | BearPi-IoT |                 |             |
+| [百问网][]      |                       | IMX6ULL |                      | SMT32MP157 |                 |             |
+| 疯壳            |                       |         | Fengke               |            |                 |             |
+
+[芯来]: https://www.nucleisys.com/
+[nuclei demo]: https://www.rvmcu.com/quickstart-doc-u-rvstar.html
+[润和 hihope]: http://hihope.org
+[hispark ai/camera]: http://www.hihope.org/pro/pro1.aspx?mtt=12
+[hispark wifi iot]: http://www.hihope.org/pro/pro1.aspx?mtt=8
+[neptune]: http://www.hihope.org/pro/pro1.aspx?mtt=27
+[bearpi-hm_nano]: https://hpm.harmonyos.com/#/cn/distribution/@bearpi%2Fbearpi_hm_nano
+[百问网]: https://www.100ask.net
 
 ## 环境、源码、编译
 
