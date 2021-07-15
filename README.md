@@ -1,17 +1,4 @@
-- [简介](summary.md)
-- [组件化编译、构建和配置脚本](build.md)
-- [编译器及工具链子系统](prebuilts.md)
-- [内核子系统概述](kernel/liteos.md)
-  - [LiteOS_a](kernel/liteos_a.md)
-  - [LiteOS_m](kernel/liteos_m.md)
-- [驱动子系统](drivers.md)
-- [测试子系统](test.md)
-- [增强软件服务子系统](domains.md)
-- [系统基础能力子系统](foundation.md)
-- [基础软件服务子系统](base.md)
-- [开源第三方组件](3rd.md)
-- [常用的工具集](utils.md)
-- [厂商提供的软件](vendor.md)
-- [应用程序样例](applications.md)
-- [其他](others.md)
-- [参考](refer.md)
+# 目标
+
+- 代码导读
+- 学习笔记
