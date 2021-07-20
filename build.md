@@ -1,6 +1,5 @@
 # OpenHarmony 组件的编译、构建
 
-gcc
 鸿蒙中可以使用多种工具进行编译，可以将其分为高、中、低三层：
 
 ```plantuml
@@ -32,7 +31,7 @@ frame "Compiler" {
 | [gn][]     | C++/Python   | o-lim  | [github](https://github.com/o-lim/generate-ninja)                                          |
 | [ninja][]  | C++/Python/C | ninja  | [github](https://github.com/ninja-build/ninja)、[Doc](https://ninja-build.org/manual.html) |
 
-[bpm]: https://www.npmjs.com/package/@ohos/hpm-cli
+[hpm]: https://www.npmjs.com/package/@ohos/hpm-cli
 [hb]: https://pypi.org/project/ohos-build/
 [gn]: https://gn.googlesource.com/gn
 [ninja]: https://ninja-build.org/
@@ -41,9 +40,9 @@ frame "Compiler" {
 
 ## gn 和 ninja
 
-说实话，理解 gn 和 ninja 对于没有接触过 make、cmake 的同学是有困难的，很难理解这些跨平台工具出现的真正意义及其要解决的问题。更不要说长期使用 VS、Eclipse、XCode 等成熟 IDE 的通信，这些过程都被 IDE 屏蔽掉了，但在 Linux 和嵌入式开发中它有是空气和水一般的存在，所以，嗯……随缘吧。
+说实话，理解 gn 和 ninja 对于没有接触过 make、cmake 的同学是有困难的，很难理解这些跨平台工具出现的真正意义及其要解决的问题。更不要说长期使用 VS、Eclipse、XCode 等成熟 IDE 的通信，这些过程都被 IDE 屏蔽掉了，但在 Linux 和嵌入式开发中它有是空气和水一般的存在，所以，嗯……尽力吧。
 
-编译文件依赖树从 make 到 cmake 至 gn+ninja，编译前后端工具从 gcc 到 gcc+llmv 至 clang+llvm，这么多年来经历的变迁不是很多，至少相比各种编程语言的变迁少太多了。
+编译系统从 make 到 cmake 至 gn+ninja，编译器（前后端工具）从 gcc 到 gcc+llmv 至 clang+llvm，这么多年来经历的变迁不是很多，至少相比各种编程语言的变迁少太多了。
 
 ninja（忍者），google chromium 团队出品，致力于比 make 更快的编译系统，ninja 像是编译器（Compiler）的预处理器，主要目的是递归查找好依赖关系，提前建立依赖树，gcc 可按照依赖树依次编译，大大减少编译期间杂乱的编译顺序造成的查找和重复时间。ninja 首次在 2016 年的 Android N 中使用，当前被广泛应用在希望从编译耗时中解脱出来的大型项目中。
 
@@ -62,9 +61,16 @@ root@90065f887932:/home/openharmony# ninja --version
 
 ### gn
 
-#### 命令
+由于特殊原因，以下资源都都需要科学上网：
 
-gn 的常用命令及简单流程：
+- gn 官网： https://gn.googlesource.com/
+- git 库： `git clone https://gn.googlesource.com/gn`
+- 在线文档：[docs](https://gn.googlesource.com/gn/+/main/docs/)、[reference](https://gn.googlesource.com/gn/+/main/docs/reference.md)
+- 版本下载：[Linux](https://chrome-infra-packages.appspot.com/dl/gn/gn/linux-amd64/+/latest)、[macOS](https://chrome-infra-packages.appspot.com/dl/gn/gn/mac-amd64/+/latest)、[windows](https://chrome-infra-packages.appspot.com/dl/gn/gn/windows-amd64/+/latest)
+
+如果不方便科学上网，可以 gitee 上搜索 gn 或 generate-ninja，可以看到网友搬运过来的，比如笔者搬运的 [gn](https://gitee.com/wkevin/gn)，其中 docs 和 examples 目录可以参考。
+
+#### gn 的常用命令及简单流程
 
 - `gn gen`: 生成 ninja 能够使用的构建文件
   - 在指定目录查找 `.gn` 文件，它没有文件名，只有扩展名，如果不存在则向上找直到找到一个，并将其设为 root，Harmony 通常从 `build/lite/.gn` 开始。
@@ -95,14 +101,6 @@ gn 是一门简单的动态类型语言，有变量，变量支持的**数据类
 
 > 更多详细的 gn 变量可以查看 `gn help` Built-in predefined variables 章节。
 
-gn 也支持简单的控制语句，如：if...else、foreach 等，gn 也支持**函数**，比如自定义一个函数：
-
-```python
-my_func("foobar"){
-sources = [ "foo.c", "bar.c" ]
-}
-```
-
 **标识**是有格式要求的字符串，最终形成的依赖关系图中所有的元素（目标 Target、配置、工具链）都有标识唯一识别，它格式要求是：
 
 ```
@@ -111,13 +109,17 @@ sources = [ "foo.c", "bar.c" ]
 
 除了 path 不能省略外，其他都能省，如果 name 省略了则标识与 path 最后一个字段同名的那么，举例：
 
-- `"//base/test:test_support(//build/toolchain/win:msvc)"` 最完整格式
+- `"//base/test:test_support(//build/toolchain/win:msvc)"` 最完整格式，定位到 `root/base/test/BUILD.gn` 文件中的 `test_support`
 - `"//base/test:test_support"`
 - `"//base/test"` 等价与 `"//base/test:test"`
 
 #### 函数
 
-当然，gn 有 30+ 个内建函数，包括：
+gn 支持简单的控制语句，如：if...else、foreach 等，gn 也支持**函数**，并且内建了很多函数，一般很少见用户自定义函数，估计内建函数已经足够使用了吧。
+
+gn 的函数命名和参数传递与 c、python 等编程语言的不同，参数传递使用 invoker 来传递。
+
+gn 有 30+ 个内建函数，包括：
 
 - `import`：引入一个文件，但与 c/c++ 的 include 不同，import 的文件将独立执行并将执行结果放入当前文件。
 - `getenv`：获取环境变量
@@ -125,13 +127,14 @@ sources = [ "foo.c", "bar.c" ]
 - `read_file`、`write_file`
 - `foreach`：迭代一个 list
 - `config`：定义 configuration 对象
-- `set_defaults`：定义某个 target 的变量默认值
+- `set_defaults`：定义某个 target 的成员变量默认值
+- `template`：定义一套 rule，调用 rule 能够生成一个 target
 
 > 更多详细的内建 functions 可以查看 `gn help` Buildfile functions 章节。
 
 **举例**：如果我们希望定义一些配置数据（并且有嵌套），然后赋值给某个变量，可以这样实现：
 
-```python
+```gn
 # build/config/BUILD.gn
 config("cpu_arch") {                    # 用 config 函数定义一个名为 cpu_arch 的配置对象
   cflags = [ "-march=$board_arch" ]
@@ -147,23 +150,25 @@ config("ohos") {                        # 定义一个名为 ohos 的配置对�
 
 然后就可以使用标识将配置对象赋值给变量
 
-```
+```gn
 default_target_configs = [ "//build/config:ohos" ]
 ```
+
+**举例**：
 
 #### 目标/功能块/Target
 
 gn 中还有个重要概念：target，有些地方翻译成目标，我觉得不是很准确，它是构造表中的一个节点，它含有一些变量，以完成一些操作，变量就像是操作的配置数据，target 就像是一段封装好的操作模块——所以我觉得翻译成**功能块**更合适些。target 的写法是：
 
-```
+```gn
 <target>("<name>") {
     <var> = ...
 }
 ```
 
-**举例**：如果要拷贝文件，使用 copy target，sources 和 outputs 变量分别指定 copy 的源和目的：
+**举例**：copy target 可以根据 sources 和 outputs 变量实现文件拷贝：
 
-```python
+```gn
 copy("compiler") {
     sources = [
       "//prebuilts/gcc/linux-x86/arm/arm-linux-ohoseabi-gcc/arm-linux-musleabi",
@@ -173,9 +178,9 @@ copy("compiler") {
   }
 ```
 
-**举例**：Harmony 中 `build/lite/BUILD.gn` 中生成跟文件系统的操作，使用了 action target：
+**举例**：action target 可以完成 script 变量指定的脚本，Harmony 中 `build/lite/BUILD.gn` 中生成跟文件系统的操作，使用了 action target：
 
-```python
+```gn
   action("gen_rootfs") {
     deps = [ ":ohos" ]
 
@@ -195,17 +200,81 @@ copy("compiler") {
 
 由于 gn 就是 python 写的，所以可以完美的兼容 python 脚本来执行操作。
 
-gn 默认定义了很多 Target，比如：
+**举例**：`source_set` 是非常关键的一个 target，定义了源码集，gn 会对其逐一生成 .o 文件，其中 configs 变量定义了编译时送给编译器的参数。比如前文已经定义好了 `default_target_configs` 变量，现在就可以使用 `set_defaults` 函数中来定义 `source_set` target 中的 configs 变量了。
 
-- action：单次运行的动作
-- action_foreach：在多个文件中依次运行脚本的 target
-- copy：执行 copy 动作
-- excutable：指定 target 是个可执行文件
-- group：声明一个 target
-- source_set：它与静态库的唯一区别是没有链接的符号文件，就是一般编译后生成的.o 文件
-- shared_library、static_library：声明一个动态（win=.dll、linux=.so）、静态库（win=.lib、linux=.a）
+```gn
+set_defaults("source_set") {
+  configs = default_target_configs
+}
+```
 
-每个 targte 都有自己的用法，`ge help <target>` 可以查看每个 target 的使用方法，里面都会有一段 demo 代码可以拿来直接使用。
+至于使用哪些编译器，gn 使用 `set_default_toolchain` 函数定义：
+
+```gn
+set_default_toolchain("//build/lite/toolchain:gcc-arm-none-eabi")
+```
+
+**举例**：`gn help template` 给出了一个例子，非常典型的使用了
+
+- 函数：template、assert、get_target_outputs
+- Target：action_foreach、source_set、executable
+
+首先定义使用 template 定义一个 rule：
+
+```gn
+template("my_idl") {
+    # 先对入参做一个判断，以免报错，抛个error是非常不好的。
+    assert(defined(invoker.sources),
+           "Need sources in $target_name listing the idl files.")
+
+    # 定义一个过程变量
+    code_gen_target_name = target_name + "_code_gen"
+
+    # action_foreach 是个 target，能够根据 {...} 内的参数执行 script 指定的脚本
+    # 本 action 是希望把 idl 文件生成出 .cc 和 .h 文件
+    action_foreach(code_gen_target_name) {
+      sources = invoker.sources
+      script = "//tools/idl/idl_code_generator.py"
+      # 告诉 gn 如何存放 output 文件，"gn help source_expansion" 有更多细节
+      outputs = [ "$target_gen_dir/{{source_name_part}}.cc",
+                  "$target_gen_dir/{{source_name_part}}.h" ]
+    }
+
+    source_set(target_name) {
+      sources = get_target_outputs(":$code_gen_target_name")
+      deps = [ ":$code_gen_target_name" ] # 指定其依赖上面 action_foreach(code_gen_target_name)
+    }
+  }
+```
+
+然后看如何使用（invoking）template：
+
+```gn
+  # my_idl 是上面 template 定义的一个 rule，调用这个 rule 生成一个名为 foo_idl_files 的 target
+  my_idl("foo_idl_files") {
+    # 这里定义的变量会转发给 rule 定义中，使用 invoker.xxx 引用
+    sources = [ "foo.idl", "bar.idl" ] # 对应 template 中的使用 invoker.sources
+  }
+
+  executable("my_exe") {
+    deps = [ ":foo_idl_files" ] # foo_idl_files 是上面定义的一个 target
+  }
+```
+
+gn 默认定义了很多 Target（功能块），比如：
+
+- 执行某个或某组动作
+  - action：单次运行的动作
+  - action_foreach：在多个文件中依次运行脚本的 target
+  - copy：执行 copy 动作
+- 生成最终目标 —— 下面这 4 个非常必要，必须选择一个或多个进行定义
+  - excutable：指定 target 是个可执行文件
+  - source_set：定义源码集，会逐一对应生成 `.o` 文件，即尚未链接（link）的文件
+  - shared_library、static_library：声明一个动态（win=`.dll`、linux=`.so`）、静态库（win=`.lib`、linux=`.a`）
+- 辅助类
+  - group：声明一个 target
+
+每个 targte 都有自己的用法，`ge help <target>` 查看，里面都会有一段 demo 代码可以拿来直接使用。
 
 > 更多详细的 Target 可以查看 `gn help` Target declarations 章节。
 
@@ -214,6 +283,8 @@ gn 默认定义了很多 Target，比如：
 ### ninja
 
 gn 会在 `out/<target>/<board>/` 下生成 build.ninja 文件，这是个普通的文本文件，打开之后甚至觉得就是个 log 文件，这估计就是 ninja 创始人说的极简哲学吧。
+
+`$ ninja -C out/<target>/<board>/` 可以编译出目标文件或可执行文件。
 
 参考：
 
@@ -259,14 +330,14 @@ build_lite 主要功能实现了一个名为 `hb` 的 Python 包，能够安装�
 
 里面只有 2 句：
 
-```python
+```gn
 buildconfig = "//build/lite/config/BUILDCONFIG.gn"
 root = "//build/lite"
 ```
 
 BUILDCONFIG.gn 代码关键架构：
 
-```python
+```gn
 import("//build/lite/ohos_var.gni")
 import("${device_path}/config.gni")
 
@@ -289,7 +360,7 @@ if (board_toolchain != "" && use_board_toolchain) { # 使用 device 指定的 to
 
 BUILDCONFIG.gn 文件下面会使用 `set_defaults` 函数完成 executable、static_library、shared_library、source_set 四个 target 的创建。
 
-```python
+```gn
 # 定义临时变量 default_target_configs
 default_target_configs += [
   "//build/lite/config:board_config",
@@ -307,7 +378,7 @@ set_defaults("source_set") {
 
 `"//build/lite/config:cpu_arch"` 是前文所说的标识，表示从 `build/lite/config` 下的 BUILD.gn 文件中提取 `cpu_arch` 对象，它的定义
 
-```python
+```gn
 config("cpu_arch") {
   cflags = []
   if (board_arch != "") {
@@ -334,7 +405,7 @@ config("cpu_arch") {
 
 回忆前文 gn 的总流程，执行完 `.gn` 后，就要执行 root 下的 BUILD.gn 文件了。该文件整体架构也非常简单：**定义 4 个 target：2 个 group、2 个 action。**
 
-```python
+```gn
 import("//build/lite/ndk/ndk.gni")
 
 # 定义 2 个 group target
@@ -562,6 +633,22 @@ python build.py ipcamera_hi3518ev300 -T applications/sample/camera/app:camera_ap
 ```
 
 可以说，build.py 实现了“不安装 hb 也能编译”的目的，其他好像没做什么。
+
+### 简要流程
+
+```plantuml
+@startmindmap
+* python build.py [build]
+ * hb set
+  * set_root_path()
+   * 提示用户选择源码根目录
+  * set_product()
+   * 搜索 vender/.../config.json，提示用户选择编译目标
+   * 根据用户选择的 config.json，读取其中的 device info（device、board、kernel、features、components）
+   * 生成 ohos_config.json
+ * hb build
+@endmindmap
+```
 
 ### History
 
@@ -810,23 +897,30 @@ deveco-device-tool-2.2.0+285431.76f4090e.vsix
 
 ## 总结
 
-### 兼容关系图
+### 总体流程图
 
 ```plantuml
-@startmindmap
-* python build.py [build]
- * hb set
-  * set_root_path()
-   * 提示用户选择源码根目录
-  * set_product()
-   * 搜索 vender/.../config.json，提示用户选择编译目标
-   * 根据用户选择的 config.json，读取其中的 device info（device、board、kernel、features、components）
-   * 生成 ohos_config.json
- * hb build
-@endmindmap
+@startuml
+|高层命令|
+#Lime: hpm i;
+#Lime: hpm dist;
+|中层命令|
+:vender/.../.../config.json|
+floating note left: 设备商提供
+#Lime:hb set;
+:ohos_config.json|
+note left: board、kernel、\nproduct、product_path、\ndevice_path 等信息
+#Lime:hb build;
+|底层命令|
+#Lime:gn gen;
+:out/.../...ninja|
+#Lime:ninja -C out/.../...;
+:out/.../...|
+note right: 生成的版本
+@enduml
 ```
 
-### 下载-编译对比表
+### 下载方式-编译方式对比表
 
 | 对比项            | HarmonyOS (repo) |  neptune (hpm)   | pegasus (hpm) | 3861 (DDT) | bearpi (DDT) | 3516/8 (DDT) |
 | ----------------- | :--------------: | :--------------: | :-----------: | :--------: | :----------: | :----------: |
