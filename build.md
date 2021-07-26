@@ -70,7 +70,7 @@ root@90065f887932:/home/openharmony# ninja --version
 
 如果不方便科学上网，可以 gitee 上搜索 gn 或 generate-ninja，可以看到网友搬运过来的，比如笔者搬运的 [gn](https://gitee.com/wkevin/gn)，其中 docs 和 examples 目录可以参考。
 
-#### gn 的常用命令及简单流程
+#### 命令与流程
 
 gn 的准备工作是这样的：
 
@@ -307,7 +307,60 @@ gn 默认定义了很多 Target（功能块），比如：
 
 > 更多详细的 Target 可以查看 `gn help` Target declarations 章节。
 
-掌握 gn 的命令、函数、变量、标识、Target……等概念，基本就能够使用 gn 完成任务了。我们在后续 hb 章节里更多的从代码中学习和分析 gn 脚本。
+#### args 传参
+
+用户如何向 gn 传递项目自定义的参数呢？有这样几种方式：
+
+```bash
+$ gn gen out/debug --args="key=int_value  key1=\"str_value\" key3=\"$(PWD)\""
+```
+
+`gn gen` 时通过 `--args` 传递进去，因为后面整体被看做一个参数，所以需要用 `""` 引号整体包围，如果 value 是数字，可以不加 `\"`，如果是字符串或 shell 变量，则需要添加 `\"`。
+
+```bash
+$ gn args out/debug [--args=...]
+```
+
+`gn args` 会先在 out/debug 下创建 args.gn 文件，然后用编辑器打开（就行 git commit 打开一个编辑器让用户填写 log 一样），等待用户添加 `key = value`。同时 `--args` 也可以添加到命令行里，规则和上面一样。
+
+gn 内建了 6 个变量，即：即使用户不做任何指定、赋值，`.gn` 和 `xxx.gni`、`xxx.gn` 都可以使用，gn 会自定义赋值的：
+
+- host_cpu
+- host_os
+- current_cpu
+- current_os
+- target_cpu
+- target_os
+
+root 下的 `.gn` 文件也可以使用 `default_args 变量` 为这 6 个变量赋默认值，比如指定不同的 target_cpu:
+
+```gn
+default_args = {
+    target_os = "freertos"
+    target_cpu = "cortex-m4"
+}
+```
+
+用户自定义的 arg，则需要多一个步骤，在 BUILDCONFIG.gn 或 BUILD.gn （取决于用户希望起效的作用域）中使用 `declare_args()` 函数进行定义，并赋默认值，如：
+
+```gn
+declare_args() {
+    ohos_build_type = "debug"
+}
+```
+
+然后，`.gn` 和 `xxx.gni`、`xxx.gn` 中就可以像普通变量一样始终这些 args 了：
+
+```gn
+if (target_os == "linux") {
+    ...
+}
+if (ohos_build_type == "debug") {
+    ...
+}
+```
+
+掌握 gn 的命令、函数、变量、标识、Target……等概念，基本就能够使用 gn 完成任务了。我们在后续 hb 章节里则会去分析具体的 Harmony 代码了。
 
 ### ninja
 
