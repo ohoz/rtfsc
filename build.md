@@ -4,20 +4,22 @@
 
 ```plantuml
 @startuml
-frame "高层" {
-    [hpm]
+left to right direction
+skinparam roundCorner 15
+rectangle "高层" {
+    (hpm)
 }
-frame "中层" {
-    [hpm] --> [hb]
+rectangle "中层" {
+    (hpm) --> (hb)
 }
-frame "底层" {
-    [make/cmake]
-    [hb] --> [gn/ninja]
+rectangle "底层" {
+    (hb) --> (gn/ninja)
+    (make/cmake)
 }
-frame "Compiler" {
-	[make/cmake] --> [gcc-front/clang]
-    [gn/ninja] --> [gcc-front/clang]
-    [gcc-front/clang] --> [llvm]
+rectangle "Compiler" {
+	(make/cmake) --> (gcc-front/clang)
+    (gn/ninja) --> (gcc-front/clang)
+    (gcc-front/clang) --> (llvm)
 }
 @enduml
 ```
@@ -374,7 +376,7 @@ gn 会在 `out/<target>/<board>/` 下生成 build.ninja 文件，这是个普通
 
 ## build_lite 与 hb
 
-**本章节解析的文件夹及对应源码路径为：**
+**本章节解析的组件及其对应的目录、git 库如下：**
 
 | hpm 组件名           | 源码目录   | gitee url                                            |
 | -------------------- | ---------- | ---------------------------------------------------- |
