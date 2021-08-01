@@ -1,5 +1,5 @@
-- [简介](summary.md)
-- [组件的编译、构建](build.md)
+- [鸿蒙的蓝海与红海](summary.md)
+- [编译构建子系统](build.md)
 - [预编译内容](prebuilts.md)
 - [内核子系统](kernel/liteos.md)
   - [LiteOS_a 源码分析](kernel/liteos_a.md)
